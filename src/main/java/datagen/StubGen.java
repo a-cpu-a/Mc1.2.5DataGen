@@ -11,6 +11,10 @@ import java.util.TreeMap;
 
 public class StubGen {
 
+    public static final String BASE_CLASS_PREFIX = "w.$";
+    public static final String BASE_CLASS_NAME_PREFIX = "$";
+    private static final String BASE_CLASS_PACKAGE = "w";
+
     /**
      * escape()
      *
@@ -65,14 +69,19 @@ public class StubGen {
         return ret;
     }
 
-    public static String genFileStubs(Class<?> c) {
+    public static FileStubs genFileStubs(Class<?> c) {
 
         StringBuilder ret = new StringBuilder();
 
+        boolean isBasePackage = true;
+
         if(c.getPackage()!=null && !c.getPackage().getName().isEmpty())
         {
-
+            isBasePackage=false;
             ret.append("package ").append(safeName(c.getPackage().getName())).append(";\n");
+        }
+        else {
+            ret.append("package ").append(BASE_CLASS_PACKAGE).append(';');
         }
 
         ret.append("\n");
@@ -97,7 +106,28 @@ public class StubGen {
         if(classShortName.indexOf('.')!=-1)
             classShortName = classShortName.substring(classShortName.indexOf('.')+1);
 
-        ret.append(createModsStr(mods, c.isSynthetic(), !isEnum,!isEnum,false)).append(type).append(" ").append(safeName(classShortName)).append(" {");
+        if(isBasePackage)
+            classShortName = BASE_CLASS_NAME_PREFIX+classShortName;
+
+        ret.append(createModsStr(mods, c.isSynthetic(), !isEnum,!isEnum,false))
+                .append(type).append(" ").append(classShortName);
+
+
+        String extension = null;
+
+        if(c.getSuperclass()!=Object.class && c.getSuperclass()!=null) {
+            extension = safeName(c.getSuperclass().getName());
+        }
+
+        if(extension!=null) {
+
+            if(isBasePackage)
+                ret.append(" extends ");
+            else
+                ret.append(" extends ").append(extension);
+        }
+
+        ret.append(" {");
 
         //tab count
         int s = 1;
@@ -113,6 +143,9 @@ public class StubGen {
         *
         * Fields
         * Synthetic fields
+        *
+        * Constructors
+        * Synthetic constructors
         *
         * Methods
         * Synthetic methods
@@ -169,7 +202,7 @@ public class StubGen {
                         access = 2;
                 }
 
-                syntheticNFieldTypeNAccess2Names.get((fType<<2) |(f.isSynthetic()?0:(1<<4)) | access).put(safeName(f.getName()),f);
+                syntheticNFieldTypeNAccess2Names.get((fType<<2) |(f.isSynthetic()?0:(1<<4)) | access).put(safeRawName(f.getName()),f);
 
             }
 
@@ -253,7 +286,7 @@ public class StubGen {
                         access = 2;
                 }
 
-                syntheticNStaticNAccess2Names.get((fType<<2) |(m.isSynthetic()?0:(1<<3)) | access).put(safeName(name),m);
+                syntheticNStaticNAccess2Names.get((fType<<2) |(m.isSynthetic()?0:(1<<3)) | access).put(safeRawName(name),m);
 
             }
 
@@ -281,8 +314,6 @@ public class StubGen {
                             ret.append(", ");
 
                     }
-                    //if(params.length!=0) //remove comma
-                    //    ret.deleteCharAt(ret.length()-1);
 
                     ret.append(")");
                     if(Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)) {
@@ -291,14 +322,9 @@ public class StubGen {
                     else {
                         ret.append(" {");
 
-                        if(value.getReturnType().isAssignableFrom(void.class))
-                            ret.append('}');
-                        else {
-                            s++;
-                            ret.append(tb(s)).append("return ").append(getValidValueStr(value.getReturnType())).append(';');
-                            s--;
-                            ret.append(tb(s)).append("}");
-                        }
+                        if(value.getReturnType()!=void.class)
+                            ret.append(" return ").append(getValidValueStr(value.getReturnType())).append("; ");
+                        ret.append("}");
                     }
 
                     spaceOut = true;
@@ -317,10 +343,39 @@ public class StubGen {
 
         ret.append("\n}\n");
 
-        return ret.toString();
+        FileStubs fs = new FileStubs(ret.toString());
+
+        if(isBasePackage) {
+            fs.extensionAlt = extension;
+            fs.extensionThis = BASE_CLASS_PREFIX+c.getName();
+            fs.altPrefix = BASE_CLASS_PREFIX;
+        }
+
+        return fs;
 
     }
 
+    public static String safeRawName(String name) {
+
+        switch (name) {
+            case "if":
+                name= "$WasInvalid$if";
+                break;
+            case "do":
+                name= "$WasInvalid$do";
+                break;
+            case "for":
+                name= "$WasInvalid$for";
+                break;
+            case "new":
+                name= "$WasInvalid$new";
+                break;
+            case "try":
+                name= "$WasInvalid$try";
+                break;
+        }
+        return name;
+    }
     public static String safeName(String name) {
 
 
@@ -365,22 +420,21 @@ public class StubGen {
             }
         }
 
-        switch (name) {
-            case "if":
-                name= "$WasInvalid$if";
-                break;
-            case "do":
-                name= "$WasInvalid$do";
-                break;
-            case "for":
-                name= "$WasInvalid$for";
-                break;
-            case "new":
-                name= "$WasInvalid$new";
-                break;
-            case "try":
-                name= "$WasInvalid$try";
-                break;
+
+        if(!name.contains(".")) {
+
+
+            if(!name.equals("boolean")
+                    && !name.equals("void")
+                    && !name.equals("long")
+                    && !name.equals("short")
+                    && !name.equals("int")
+                    && !name.equals("float")
+                    && !name.equals("double")
+                    && !name.equals("char")
+                    && !name.equals("byte")
+            )
+                name = BASE_CLASS_PREFIX+name;
         }
 
         if(array)

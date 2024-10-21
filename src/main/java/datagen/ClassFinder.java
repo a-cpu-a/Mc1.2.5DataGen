@@ -5,23 +5,15 @@ import cpw.mods.fml.common.ModClassLoader;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class ClassFinder {
@@ -31,6 +23,7 @@ public class ClassFinder {
     private static final String LWJGL_PACKAGE_PREFIX = "org.lwjgl.";
     private static final String JAVA_GAMES_PACKAGE_PREFIX = "net.java.games.";
     private static final String LUAJ_PACKAGE_PREFIX = "org.luaj.";
+    private static final String MY_PACKAGE_PREFIX = "datagen.";
 
     public static List<String> findClasses(URLClassLoader classLoader, String folderPath) throws IOException, URISyntaxException {
         Set<String> classNames = new HashSet<>();
@@ -91,7 +84,10 @@ public class ClassFinder {
                     && !className.startsWith(LWJGL_PACKAGE_PREFIX)
                     && !className.startsWith(JAVA_GAMES_PACKAGE_PREFIX)
                     && !className.startsWith(LUAJ_PACKAGE_PREFIX)
-                    && !className.startsWith(JAVAX_PACKAGE_PREFIX)) {
+                    && !className.startsWith(JAVAX_PACKAGE_PREFIX)
+                    //exclude our code
+                    && !className.startsWith(MY_PACKAGE_PREFIX)
+                    && !className.endsWith("_DataGen")) {
                 filtered.add(className);
             }
         }
@@ -130,11 +126,21 @@ public class ClassFinder {
                     }*/
 
                     //Dump the class!
-                    String stubs = StubGen.genFileStubs(clz);
-                    byte[] bytes = stubs.getBytes(StandardCharsets.UTF_8);
+                    FileStubs stubs = StubGen.genFileStubs(clz);
+
+                    String bText = stubs.fileText;
+                    if(stubs.extensionThis!=null) {
+                        bText = bText.replace("package w;","");
+                        bText = bText.replace("class $","class ");
+                        bText = bText.replace(
+                                " extends ",
+                                " extends "+stubs.extensionThis
+                        );
+                    }
+                    byte[] bytes = bText.getBytes(StandardCharsets.UTF_8);
 
                     ZipEntry zipEntry = new ZipEntry(
-                            StubGen.safeName(className).replace('.','/')+".java"
+                            StubGen.safeRawName(className).replace('.','/')+".java"
                     );  // Create a new zip entry
                     //zipEntry.setSize(bytes.length);
                     zipEntry.setTime(0);
@@ -143,7 +149,31 @@ public class ClassFinder {
                     zipOut.write(bytes,0,bytes.length);
                     zipOut.closeEntry();
 
-                    System.out.println("(DATAGEN) "+className);
+                    if(stubs.extensionThis!=null) {
+                        String aString = stubs.fileText;
+
+                        if(stubs.extensionAlt!=null) {
+                            aString = aString.replace(
+                                    " extends ",
+                                    " extends "+stubs.extensionAlt
+                            );
+                        }
+
+                        byte[] bytesA = aString
+                                .getBytes(StandardCharsets.UTF_8);
+
+                        zipEntry = new ZipEntry(
+                                (stubs.altPrefix+className).replace('.','/')+".java"
+                        );  // Create a new zip entry
+                        //zipEntry.setSize(bytes.length);
+                        zipEntry.setTime(0);
+
+                        zipOut.putNextEntry(zipEntry);
+                        zipOut.write(bytesA,0,bytesA.length);
+                        zipOut.closeEntry();
+                    }
+
+                    //System.out.println("(DATAGEN) "+className);
 
 
                 } catch (Exception | NoClassDefFoundError | ExceptionInInitializerError e) {
