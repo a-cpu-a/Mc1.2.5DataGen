@@ -501,7 +501,7 @@ public class StubGen{
                 else if(type==double.class)
                     return ""+f.getDouble(null);
                 else if(type==char.class)
-                    return ""+f.getChar(null);
+                    return ""+((int)f.getChar(null));
                 else if(type==String.class)
                     return "\""+escape(f.get(null).toString())+"\"";
             } catch (Exception ignored) {
