@@ -91,6 +91,9 @@ public class Enum <E extends Enum<E>>
         this.ordinal = ordinal;
     }
 
+    /**FAKE, DO NOT USE!!!*/
+    protected Enum() {}
+
     /**
      * Returns the name of this enum constant, as contained in the
      * declaration.  This method may be overridden, though it typically
