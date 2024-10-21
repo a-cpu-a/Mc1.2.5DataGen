@@ -41,7 +41,7 @@ public class StubGen{
 
         String ret = "";
 
-        if(bridge)                                  ret+="/*bridge*/ ";
+        if(bridge)                                  ret+="// /*bridge*/ ";
         if(synthetic)                               ret+="/*synthetic*/ ";
         if(Modifier.isPrivate(mods)) {
             if(isClass)
