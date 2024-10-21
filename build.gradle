@@ -2,18 +2,36 @@ plugins {
     id 'java'
 }
 
-group = 'net.minecraft.src'
+group = 'datagen.v125'
 version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
+compileJava.options.encoding = "UTF-8"
+
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
+java {
+    toolchain {
+        //v7, cuz that works in 1.2.5
+        languageVersion = JavaLanguageVersion.of(7)
+    }
+}
+
 test {
     useJUnitPlatform()
+}
+
+jar {
+
+    include("assets/**") //only my assets
+    include("datagen/**") //only my code
+    include("mod_DataGen*") //only my mod
+
+    //everything else is excluded by default
 }
