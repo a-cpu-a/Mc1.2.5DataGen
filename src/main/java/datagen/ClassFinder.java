@@ -164,6 +164,10 @@ public class ClassFinder {
                     if(stubs.extensionThis!=null) {
                         String aString = stubs.fileText;
 
+
+                        aString = aString.replace("\nclass ","\n/*default */public class ");
+                        aString = aString.replace("\nfinal class ","\n/*default */public final class ");
+
                         aString = aString.replace("final class ","/*final*/ class ");
 
                         if(stubs.extensionAlt!=null) {

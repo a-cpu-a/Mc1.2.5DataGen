@@ -49,11 +49,16 @@ public class StubGen{
         }
         if(Modifier.isPrivate(mods)) {
             if(isClass)
-                ret+="/*private*/ ";
+                ret+="/*private*/public ";
             else
                 ret+="private ";
         }
-        if(Modifier.isProtected(mods))              ret+="protected ";
+        if(Modifier.isProtected(mods)) {
+            if(isClass)
+                ret+="/*protected*/public ";
+            else
+                ret+="protected ";
+        }
         if(Modifier.isPublic(mods))                 ret+="public ";
         if(Modifier.isStatic(mods)) {
             if(isClass)
