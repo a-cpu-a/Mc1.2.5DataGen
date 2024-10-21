@@ -35,18 +35,14 @@ public class StubGen{
     }
 
     /**either empty, or has space at the end*/
-    static String createModsStr(int mods,boolean synthetic,
+    static String createModsStr(int mods,boolean synthetic,boolean bridge,
                                 boolean isClass,boolean addFinal,
                                 boolean isMethod) {
 
         String ret = "";
 
-        if(synthetic) {
-            if(isMethod)
-                ret+="/*synthetic*/ ";
-            else
-                ret+="/*synthetic*/ ";
-        }
+        if(bridge)                                  ret+="/*bridge*/ ";
+        if(synthetic)                               ret+="/*synthetic*/ ";
         if(Modifier.isPrivate(mods)) {
             if(isClass)
                 ret+="/*private*/public ";
@@ -127,7 +123,7 @@ public class StubGen{
         if(isBasePackage)
             classShortName = BASE_CLASS_NAME_PREFIX+classShortName;
 
-        ret.append(createModsStr(mods, c.isSynthetic(), true,true,false))
+        ret.append(createModsStr(mods, c.isSynthetic(),false, true,true,false))
                 .append(type).append(" ").append(classShortName);
 
 
@@ -136,7 +132,8 @@ public class StubGen{
         if(c.getSuperclass()!=Object.class && c.getSuperclass()!=null) {
             extension = safeName(c.getSuperclass().getName());
 
-
+            if(extension.equals("java.lang.Enum"))
+                extension = "jlang.Enum";
         }
 
 
@@ -232,7 +229,7 @@ public class StubGen{
                 for (Map.Entry<String,Field> e : fields.entrySet()) {
                     Field value = e.getValue();
 
-                    ret.append(tb(s)).append(createModsStr(value.getModifiers(), value.isSynthetic(),false,true,false)).append(safeName(value.getType().getName())).append(' ').append(e.getKey());
+                    ret.append(tb(s)).append(createModsStr(value.getModifiers(), value.isSynthetic(),false,false,true,false)).append(safeName(value.getType().getName())).append(' ').append(e.getKey());
 
                     //final, or a static non-object/string
                     if(Modifier.isFinal(value.getModifiers())
@@ -327,7 +324,7 @@ public class StubGen{
                         isMethod=false;
 
                     ret.append(tb(s))
-                            .append(createModsStr(modifiers, value.isSynthetic(),false,true,isMethod))
+                            .append(createModsStr(modifiers, value.isSynthetic(), value.isBridge(), false,true,isMethod))
                             .append(safeName(value.getReturnType().getName()))
                             .append(' ').append(name).append("(");
 
@@ -390,6 +387,13 @@ public class StubGen{
             case "do":
                 name= "$WasInvalid$do";
                 break;
+            case "ee":
+                name= "$WasInvalid$ee";
+                break;
+            case "eu":
+                name= "$WasInvalid$eu";
+                break;
+                /*
             case "for":
                 name= "$WasInvalid$for";
                 break;
@@ -398,7 +402,7 @@ public class StubGen{
                 break;
             case "try":
                 name= "$WasInvalid$try";
-                break;
+                break;*/
         }
         return name;
     }

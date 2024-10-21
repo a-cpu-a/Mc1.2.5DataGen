@@ -133,7 +133,7 @@ public class ClassFinder {
 
                         String classPrefix = "";
 
-                        if(className.equals("if") || className.equals("do"))
+                        if(className.equals("if") || className.equals("do") || className.equals("eu") || className.equals("ee"))
                             classPrefix = "$WasInvalid$";
 
                         bText = bText.replace("package "+StubGen.BASE_CLASS_PACKAGE+";","");
@@ -142,6 +142,8 @@ public class ClassFinder {
 
                         bText = bText.replace(StubGen.BASE_CLASS_PREFIX+"if ","$WasInvalid$if ");
                         bText = bText.replace(StubGen.BASE_CLASS_PREFIX+"do ","$WasInvalid$do ");
+                        bText = bText.replace(StubGen.BASE_CLASS_PREFIX+"eu ","$WasInvalid$eu ");
+                        bText = bText.replace(StubGen.BASE_CLASS_PREFIX+"ee ","$WasInvalid$ee ");
 
                         bText = bText.replace(StubGen.BASE_CLASS_PREFIX,"");
                         bText = bText.replace(
@@ -165,10 +167,19 @@ public class ClassFinder {
                         String aString = stubs.fileText;
 
 
-                        aString = aString.replace("\nclass ","\n/*default */public class ");
-                        aString = aString.replace("\nfinal class ","\n/*default */public final class ");
+                        int idxClass = aString.indexOf("class");
+                        if(idxClass==-1)
+                            idxClass = aString.indexOf("interface");
 
-                        aString = aString.replace("final class ","/*final*/ class ");
+                        int idxPublic = aString.indexOf("public");
+
+                        if(idxPublic==-1 || idxPublic>idxClass) {
+                            aString = new StringBuffer(aString)
+                                    .insert(idxClass,"public/*default*/ ")
+                                    .toString();
+                        }
+
+                        aString = aString.replace("final","/*final*/");
 
                         if(stubs.extensionAlt!=null) {
                             aString = aString.replace(

@@ -18,6 +18,7 @@ dependencies {
 
     implementation files('libs/lwjgl.jar')
     implementation files('libs/lwjgl_util.jar')
+    implementation files('libs/luaj.zip')
 }
 
 java {
