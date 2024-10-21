@@ -92,7 +92,7 @@ public class Enum <E extends Enum<E>>
     }
 
     /**FAKE, DO NOT USE!!!*/
-    protected Enum() {}
+    protected Enum() {this.name=null;this.ordinal=-1;}
 
     /**
      * Returns the name of this enum constant, as contained in the
