@@ -41,7 +41,12 @@ public class StubGen {
 
         String ret = "";
 
-        if(synthetic)                               ret+="/*synthetic*/ ";
+        if(synthetic) {
+            if(isMethod)
+                ret+="// /*synthetic*/ ";
+            else
+                ret+="/*synthetic*/ ";
+        }
         if(Modifier.isPrivate(mods))                ret+="private ";
         if(Modifier.isProtected(mods))              ret+="protected ";
         if(Modifier.isPublic(mods))                 ret+="public ";
@@ -379,14 +384,13 @@ public class StubGen {
     public static String safeName(String name) {
 
 
-        boolean array = name.startsWith("[");
+        int array = name.lastIndexOf('[');
 
-        if(array) {
+        if(array!=-1) {
             //decode it
 
-
             //remove array thing
-            name = name.substring(1);
+            name = name.substring(array+1);
 
             switch (name.charAt(0)) {
                 case 'B':
@@ -437,8 +441,15 @@ public class StubGen {
                 name = BASE_CLASS_PREFIX+name;
         }
 
-        if(array)
-            return name+"[]";
+        if(array>0) {
+
+            StringBuilder nameBuilder = new StringBuilder(name);
+            for (int i = 0; i < array; i++) {
+                nameBuilder.append("[]");
+            }
+
+            return nameBuilder.toString();
+        }
 
         return name;
     }
@@ -461,6 +472,12 @@ public class StubGen {
                     return v;
                 else if(type==boolean.class)
                     return v;
+                else if(type==float.class)
+                    return v;
+                else if(type==double.class)
+                    return v;
+                else if(type==char.class)
+                    return v;
                 else if(type==String.class)
                     return "\""+escape(v)+"\"";
             } catch (Exception ignored) {
@@ -482,6 +499,12 @@ public class StubGen {
             return "0";
         else if(type==boolean.class)
             return "false";
+        else if(type==float.class)
+            return "0.0f";
+        else if(type==double.class)
+            return "0.0";
+        else if(type==char.class)
+            return "0";
         else if(type==String.class)
             return "\"\"";
 
