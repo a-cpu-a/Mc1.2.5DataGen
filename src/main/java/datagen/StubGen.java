@@ -461,25 +461,24 @@ public class StubGen {
 
         if(Modifier.isStatic(f.getModifiers())) {
             try {
-                String v = f.get(null).toString();
                 if(type==byte.class)
-                    return v;
+                    return ""+f.getByte(null);
                 else if(type==short.class)
-                    return v;
+                    return ""+f.getShort(null);
                 else if(type==int.class)
-                    return v;
+                    return ""+f.getInt(null);
                 else if(type==long.class)
-                    return v;
+                    return ""+f.getLong(null);
                 else if(type==boolean.class)
-                    return v;
+                    return ""+f.getBoolean(null);
                 else if(type==float.class)
-                    return v;
+                    return ""+f.getFloat(null);
                 else if(type==double.class)
-                    return v;
+                    return ""+f.getDouble(null);
                 else if(type==char.class)
-                    return v;
+                    return ""+f.getChar(null);
                 else if(type==String.class)
-                    return "\""+escape(v)+"\"";
+                    return "\""+escape(f.get(null).toString())+"\"";
             } catch (Exception ignored) {
             }
         }
