@@ -315,7 +315,35 @@ public class StubGen{
                         ret.append(';');
                     }
                     else {
-                        ret.append(" {}");
+                        if(extension==null)
+                            ret.append(" {}");
+                        else {
+                            Class<?> sClass = c.getSuperclass();
+                            Constructor[] constructors1 = sClass.getDeclaredConstructors();
+                            Constructor goodConstructor = null;
+                            int score = 9999;
+                            for (Constructor con : constructors1) {
+                                if(Modifier.isPrivate(con.getModifiers()))
+                                    continue;
+                                if(con.getParameterTypes().length>=score)
+                                    continue;
+                                goodConstructor = con;
+                                score = con.getParameterTypes().length;
+                            }
+
+                            if(score==0)
+                                ret.append(" {}");
+                            else  {
+                                ret.append(" {super(");
+                                int k = 0;
+                                for (Class<?> cl : goodConstructor.getParameterTypes()) {
+                                    ret.append(getValidValueStr(cl));
+                                    if(++k<score)
+                                        ret.append(", ");
+                                }
+                                ret.append("); }");
+                            }
+                        }
                     }
 
                     spaceOut = true;
