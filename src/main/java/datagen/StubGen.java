@@ -94,7 +94,7 @@ public class StubGen{
         if(c.getPackage()!=null && !c.getPackage().getName().isEmpty())
         {
             isBasePackage=false;
-            ret.append("package ").append(safeRawName(c.getPackage().getName())).append(";\n");
+            ret.append("package ").append(c.getPackage().getName()).append(";\n");
         }
         else {
             ret.append("package ").append(BASE_CLASS_PACKAGE).append(';');
