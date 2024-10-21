@@ -145,16 +145,20 @@ public class ClassFinder {
                         bText = bText.replace("class "+ BASE_CLASS_NAME_PREFIX,"class "+classPrefix);
                         bText = bText.replace("interface "+ BASE_CLASS_NAME_PREFIX,"interface "+classPrefix);
 
+
                         bText = bText.replace(StubGen.BASE_CLASS_PREFIX+"if ","$WasInvalid$if ");
                         bText = bText.replace(StubGen.BASE_CLASS_PREFIX+"do ","$WasInvalid$do ");
                         bText = bText.replace(StubGen.BASE_CLASS_PREFIX+"eu ","$WasInvalid$eu ");
                         bText = bText.replace(StubGen.BASE_CLASS_PREFIX+"ee ","$WasInvalid$ee ");
 
+                        bText = bText.replace(CONSTRUCTOR_TAG+ BASE_CLASS_NAME_PREFIX,CONSTRUCTOR_TAG+classPrefix);
+
+  /*
                         bText = bText.replace(CONSTRUCTOR_TAG+BASE_CLASS_NAME_PREFIX+"if","$WasInvalid$if");
                         bText = bText.replace(CONSTRUCTOR_TAG+BASE_CLASS_NAME_PREFIX+"do","$WasInvalid$do");
                         bText = bText.replace(CONSTRUCTOR_TAG+BASE_CLASS_NAME_PREFIX+"eu","$WasInvalid$eu");
                         bText = bText.replace(CONSTRUCTOR_TAG+BASE_CLASS_NAME_PREFIX+"ee","$WasInvalid$ee");
-
+*/
                         bText = bText.replace(StubGen.BASE_CLASS_PREFIX,"");
                         bText = bText.replace(
                                 " extends ",
