@@ -4,13 +4,25 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ModClassLoader;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 public class ClassFinder {
 
@@ -22,7 +34,7 @@ public class ClassFinder {
 
     public static List<String> findClasses(URLClassLoader classLoader, String folderPath) throws IOException, URISyntaxException {
         Set<String> classNames = new HashSet<>();
-        
+
         // Step 1: Get classes from URLClassLoader's URLs
         for (URL url : classLoader.getURLs()) {
             File filePath = new File(url.toURI());
@@ -30,7 +42,7 @@ public class ClassFinder {
                 classNames.addAll(getClassesFromJarOrZip(filePath));
             }
         }
-        
+
         // Step 2: Get classes from JARs/ZIPs in the folder
         File folder = new File(folderPath);
         if (folder.exists() && folder.isDirectory()) {
@@ -52,7 +64,7 @@ public class ClassFinder {
         List<String> classNames = new ArrayList<>();
         JarFile jarFile = new JarFile(filePath);
         Enumeration<JarEntry> entries = jarFile.entries();
-        
+
         while (entries.hasMoreElements()) {
             JarEntry entry = entries.nextElement();
             String entryName = entry.getName();
@@ -66,7 +78,7 @@ public class ClassFinder {
                 classNames.add(className);
             }
         }
-        
+
         jarFile.close();
         return classNames;
     }
@@ -97,18 +109,52 @@ public class ClassFinder {
 
         Collections.shuffle(classList);
 
-        for (String className : classList) {
-            try {
-                Class.forName(className);
-                System.out.println("(DATAGEN) "+className);
 
-                //Dump the class!
+        File zipPath = new File(minecraftDir,"stubs.zip");
 
-            } catch (Exception | NoClassDefFoundError | ExceptionInInitializerError e) {
-                e.printStackTrace();
-                System.out.println("(DATAGEN) "+className+" (ERROR 98)");
+        System.out.println("Creating at '"+zipPath+"' (DATAGEN)");
+
+        try (FileOutputStream fos = new FileOutputStream(zipPath)){
+            ZipOutputStream zipOut = new ZipOutputStream(fos);
+
+            for (String className : classList) {
+                try {
+                    Class<?> clz = Class.forName(className);
+                    /*if(clz==null)
+                        clz = Class.forName(className,true,urlClassLoader);
+
+                    if(clz==null) {
+
+                        System.err.println("(Error 87) AAAAAA helpepleplp "+className);
+                        continue;
+                    }*/
+
+                    //Dump the class!
+                    String stubs = StubGen.genFileStubs(clz);
+                    byte[] bytes = stubs.getBytes(StandardCharsets.UTF_8);
+
+                    ZipEntry zipEntry = new ZipEntry(
+                            StubGen.safeName(className).replace('.','/')+".java"
+                    );  // Create a new zip entry
+                    //zipEntry.setSize(bytes.length);
+                    zipEntry.setTime(0);
+
+                    zipOut.putNextEntry(zipEntry);
+                    zipOut.write(bytes,0,bytes.length);
+                    zipOut.closeEntry();
+
+                    System.out.println("(DATAGEN) "+className);
+
+
+                } catch (Exception | NoClassDefFoundError | ExceptionInInitializerError e) {
+                    System.out.println("(DATAGEN) "+className+" (ERROR 98)");
+                    e.printStackTrace();
+                }
             }
+
+            zipOut.close();
         }
+
         System.out.println("(DATAGEN) Over!");
     }
 }
