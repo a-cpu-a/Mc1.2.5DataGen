@@ -16,6 +16,9 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static datagen.StubGen.BASE_CLASS_NAME_PREFIX;
+import static datagen.StubGen.CONSTRUCTOR_TAG;
+
 public class ClassFinder {
 
     private static final String JAVA_PACKAGE_PREFIX = "java.";
@@ -139,13 +142,18 @@ public class ClassFinder {
                             classPrefix = "$WasInvalid$";
 
                         bText = bText.replace("package "+StubGen.BASE_CLASS_PACKAGE+";","");
-                        bText = bText.replace("class "+StubGen.BASE_CLASS_NAME_PREFIX,"class "+classPrefix);
-                        bText = bText.replace("interface "+StubGen.BASE_CLASS_NAME_PREFIX,"interface "+classPrefix);
+                        bText = bText.replace("class "+ BASE_CLASS_NAME_PREFIX,"class "+classPrefix);
+                        bText = bText.replace("interface "+ BASE_CLASS_NAME_PREFIX,"interface "+classPrefix);
 
                         bText = bText.replace(StubGen.BASE_CLASS_PREFIX+"if ","$WasInvalid$if ");
                         bText = bText.replace(StubGen.BASE_CLASS_PREFIX+"do ","$WasInvalid$do ");
                         bText = bText.replace(StubGen.BASE_CLASS_PREFIX+"eu ","$WasInvalid$eu ");
                         bText = bText.replace(StubGen.BASE_CLASS_PREFIX+"ee ","$WasInvalid$ee ");
+
+                        bText = bText.replace(CONSTRUCTOR_TAG+BASE_CLASS_NAME_PREFIX+"if","$WasInvalid$if");
+                        bText = bText.replace(CONSTRUCTOR_TAG+BASE_CLASS_NAME_PREFIX+"do","$WasInvalid$do");
+                        bText = bText.replace(CONSTRUCTOR_TAG+BASE_CLASS_NAME_PREFIX+"eu","$WasInvalid$eu");
+                        bText = bText.replace(CONSTRUCTOR_TAG+BASE_CLASS_NAME_PREFIX+"ee","$WasInvalid$ee");
 
                         bText = bText.replace(StubGen.BASE_CLASS_PREFIX,"");
                         bText = bText.replace(
@@ -153,6 +161,7 @@ public class ClassFinder {
                                 " extends "+stubs.extensionThis
                         );
                     }
+                    bText = bText.replace(CONSTRUCTOR_TAG,"");
                     byte[] bytes = bText.getBytes(StandardCharsets.UTF_8);
 
                     ZipEntry zipEntry = new ZipEntry(
@@ -197,6 +206,8 @@ public class ClassFinder {
                                     " "
                             );
                         }
+                        //no need to super, if there are no constructors!
+                        aString = aString.replace(CONSTRUCTOR_TAG,"void _$defused_$");
 
                         byte[] bytesA = aString
                                 .getBytes(StandardCharsets.UTF_8);

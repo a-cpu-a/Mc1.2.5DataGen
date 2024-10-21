@@ -1,5 +1,6 @@
 package datagen;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -14,6 +15,7 @@ public class StubGen{
     public static final String BASE_CLASS_PREFIX = "zzz.$";
     public static final String BASE_CLASS_NAME_PREFIX = "$";
     public static final String BASE_CLASS_PACKAGE = "zzz";
+    public static final String CONSTRUCTOR_TAG = "#Constructor#";
 
     /**
      * escape()
@@ -251,6 +253,83 @@ public class StubGen{
             }
 
         }
+
+        //Constructors
+
+        {
+            List<Map<String, Constructor<?>>> syntheticNAccess2Names
+                    = new ArrayList<>(2*4);
+
+            for (int i = 0; i < 8; i++) {
+                syntheticNAccess2Names.add(new TreeMap<String,Constructor<?>>());
+            }
+
+            for (Constructor<?> m : c.getDeclaredConstructors()) {
+
+                String name = m.getName();
+
+                byte access = 0;
+
+                int fMods = m.getModifiers();
+
+                if(!Modifier.isPublic(fMods))
+                {
+                    if(Modifier.isProtected(fMods))
+                        access = 1;
+                    else if(Modifier.isPrivate(fMods))
+                        access = 3;
+                    else
+                        access = 2;
+                }
+
+                syntheticNAccess2Names.get((m.isSynthetic()?0:(1<<2)) | access).put(name,m);
+
+            }
+
+
+            boolean spaceOut = false;
+
+            for (Map<String,Constructor<?>> constructors : syntheticNAccess2Names) {
+
+                for (Map.Entry<String,Constructor<?>> e : constructors.entrySet()) {
+                    Constructor<?> value = e.getValue();
+
+                    int modifiers = value.getModifiers();
+
+                    ret.append(tb(s))
+                            .append(createModsStr(modifiers, value.isSynthetic(), false, false,true,true))
+                            .append(CONSTRUCTOR_TAG).append(classShortName).append("(");
+
+                    int i = 0;
+                    Class<?>[] params = value.getParameterTypes();
+                    for (Class<?> param : params) {
+
+                        ret.append(safeName(param.getName())).append(" p").append(i++);
+                        if(i<params.length)
+                            ret.append(", ");
+
+                    }
+
+                    ret.append(")");
+                    if(Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers)) {
+                        ret.append(';');
+                    }
+                    else {
+                        ret.append(" {}");
+                    }
+
+                    spaceOut = true;
+                }
+
+
+                if(spaceOut)
+                    ret.append(tb(s));
+                spaceOut = false;
+
+            }
+
+        }
+
 
         //Methods
 
