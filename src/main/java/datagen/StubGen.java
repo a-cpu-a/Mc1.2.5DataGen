@@ -31,7 +31,9 @@ public class StubGen {
     }
 
     /**either empty, or has space at the end*/
-    static String createModsStr(int mods,boolean synthetic,boolean isClass) {
+    static String createModsStr(int mods,boolean synthetic,
+                                boolean isClass,boolean addFinal,
+                                boolean isMethod) {
 
         String ret = "";
 
@@ -39,12 +41,23 @@ public class StubGen {
         if(Modifier.isPrivate(mods))                ret+="private ";
         if(Modifier.isProtected(mods))              ret+="protected ";
         if(Modifier.isPublic(mods))                 ret+="public ";
-        if(Modifier.isStatic(mods))                 ret+="static ";
-        if(Modifier.isFinal(mods))                  ret+="final ";
+        if(Modifier.isStatic(mods)) {
+            if(isClass)
+                ret+="/*static*/ ";
+            else
+                ret+="static ";
+        }
+        if(addFinal && Modifier.isFinal(mods))      ret+="final ";
         if(Modifier.isTransient(mods))              ret+="transient ";
         if(Modifier.isStrict(mods))                 ret+="strict ";
         if(Modifier.isSynchronized(mods))           ret+="synchronized ";
-        if(Modifier.isVolatile(mods))               ret+="volatile ";
+        if(Modifier.isVolatile(mods)) {
+
+            if(isMethod || isClass)
+                ret+="/*volatile*/ ";
+            else
+                ret+="volatile ";
+        }
         if(Modifier.isAbstract(mods))               ret+="abstract ";
         if(Modifier.isNative(mods))                 ret+="native ";
         if(!isClass && Modifier.isInterface(mods))  ret+="/*interface*/ ";
@@ -79,13 +92,21 @@ public class StubGen {
                 type="class";
         }
 
-        ret.append(createModsStr(mods, c.isSynthetic(), !isEnum)).append(type).append(" ").append(safeName(c.getName())).append(" {");
+        String classShortName=c.getName();
+
+        if(classShortName.indexOf('.')!=-1)
+            classShortName = classShortName.substring(classShortName.indexOf('.'));
+
+        ret.append(createModsStr(mods, c.isSynthetic(), !isEnum,!isEnum)).append(type).append(" ").append(safeName(classShortName)).append(" {");
 
         //tab count
         int s = 1;
 
 
         ret.append(tb(s));
+
+        if(isEnum)
+            ret.append("; //this is cuz enums are in field form already");
 
         /*
         * Order (local)
@@ -160,7 +181,7 @@ public class StubGen {
                 for (Map.Entry<String,Field> e : fields.entrySet()) {
                     Field value = e.getValue();
 
-                    ret.append(tb(s)).append(createModsStr(value.getModifiers(), value.isSynthetic(),false)).append(safeName(value.getType().getName())).append(' ').append(e.getKey());
+                    ret.append(tb(s)).append(createModsStr(value.getModifiers(), value.isSynthetic(),false,true)).append(safeName(value.getType().getName())).append(' ').append(e.getKey());
 
                     //final, or a static non-object/string
                     if(Modifier.isFinal(value.getModifiers())
@@ -205,6 +226,15 @@ public class StubGen {
 
             for (Method m : c.getDeclaredMethods()) {
 
+                String name = m.getName();
+
+                if(isEnum) {
+
+                    if(name.equals("values")
+                    || name.equals("valueOf"))
+                        continue;
+                }
+
                 byte fType = 0;
                 byte access = 0;
 
@@ -223,7 +253,7 @@ public class StubGen {
                         access = 2;
                 }
 
-                syntheticNStaticNAccess2Names.get((fType<<2) |(m.isSynthetic()?0:(1<<3)) | access).put(safeName(m.getName()),m);
+                syntheticNStaticNAccess2Names.get((fType<<2) |(m.isSynthetic()?0:(1<<3)) | access).put(safeName(name),m);
 
             }
 
@@ -238,7 +268,7 @@ public class StubGen {
                     int modifiers = value.getModifiers();
 
                     ret.append(tb(s))
-                            .append(createModsStr(modifiers, value.isSynthetic(),false))
+                            .append(createModsStr(modifiers, value.isSynthetic(),false,true))
                             .append(safeName(value.getReturnType().getName()))
                             .append(' ').append(e.getKey()).append("(");
 
