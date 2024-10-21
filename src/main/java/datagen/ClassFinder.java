@@ -132,6 +132,7 @@ public class ClassFinder {
                     if(stubs.extensionThis!=null) {
                         bText = bText.replace("package w;","");
                         bText = bText.replace("class $","class ");
+                        bText = bText.replace("w.$","");
                         bText = bText.replace(
                                 " extends ",
                                 " extends "+stubs.extensionThis
@@ -156,6 +157,11 @@ public class ClassFinder {
                             aString = aString.replace(
                                     " extends ",
                                     " extends "+stubs.extensionAlt
+                            );
+                        } else {
+                            aString = aString.replace(
+                                    " extends ",
+                                    " "
                             );
                         }
 

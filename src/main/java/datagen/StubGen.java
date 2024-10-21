@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 
-public class StubGen {
+public class StubGen{
 
     public static final String BASE_CLASS_PREFIX = "w.$";
     public static final String BASE_CLASS_NAME_PREFIX = "$";
@@ -43,11 +43,16 @@ public class StubGen {
 
         if(synthetic) {
             if(isMethod)
-                ret+="// /*synthetic*/ ";
+                ret+="/*synthetic*/ ";
             else
                 ret+="/*synthetic*/ ";
         }
-        if(Modifier.isPrivate(mods))                ret+="private ";
+        if(Modifier.isPrivate(mods)) {
+            if(isClass)
+                ret+="/*private*/ ";
+            else
+                ret+="private ";
+        }
         if(Modifier.isProtected(mods))              ret+="protected ";
         if(Modifier.isPublic(mods))                 ret+="public ";
         if(Modifier.isStatic(mods)) {
@@ -57,7 +62,12 @@ public class StubGen {
                 ret+="static ";
         }
         if(addFinal && Modifier.isFinal(mods))      ret+="final ";
-        if(Modifier.isTransient(mods))              ret+="transient ";
+        if(Modifier.isTransient(mods)) {
+            if(isMethod || isClass)
+                ret+="/*transient*/ ";
+            else
+                ret+="transient ";
+        }
         if(Modifier.isStrict(mods))                 ret+="strict ";
         if(Modifier.isSynchronized(mods))           ret+="synchronized ";
         if(Modifier.isVolatile(mods)) {
@@ -83,7 +93,7 @@ public class StubGen {
         if(c.getPackage()!=null && !c.getPackage().getName().isEmpty())
         {
             isBasePackage=false;
-            ret.append("package ").append(safeName(c.getPackage().getName())).append(";\n");
+            ret.append("package ").append(safeRawName(c.getPackage().getName())).append(";\n");
         }
         else {
             ret.append("package ").append(BASE_CLASS_PACKAGE).append(';');
@@ -95,26 +105,24 @@ public class StubGen {
 
         //TODO: imports
 
-        boolean isEnum = c.isEnum();
+        //boolean isEnum = c.isEnum();
         int mods = c.getModifiers();
         String type = "enum";
 
-        if(!isEnum) {
-            if(Modifier.isInterface(mods))
-                type = "interface";
-            else
-                type="class";
-        }
+        if(Modifier.isInterface(mods))
+            type = "interface";
+        else
+            type="class";
 
         String classShortName=c.getName();
 
-        if(classShortName.indexOf('.')!=-1)
-            classShortName = classShortName.substring(classShortName.indexOf('.')+1);
+        if(classShortName.lastIndexOf('.')!=-1)
+            classShortName = classShortName.substring(classShortName.lastIndexOf('.')+1);
 
         if(isBasePackage)
             classShortName = BASE_CLASS_NAME_PREFIX+classShortName;
 
-        ret.append(createModsStr(mods, c.isSynthetic(), !isEnum,!isEnum,false))
+        ret.append(createModsStr(mods, c.isSynthetic(), true,true,false))
                 .append(type).append(" ").append(classShortName);
 
 
@@ -122,15 +130,15 @@ public class StubGen {
 
         if(c.getSuperclass()!=Object.class && c.getSuperclass()!=null) {
             extension = safeName(c.getSuperclass().getName());
+
+
         }
 
-        if(extension!=null) {
 
-            if(isBasePackage)
-                ret.append(" extends ");
-            else
-                ret.append(" extends ").append(extension);
-        }
+        if(isBasePackage)
+            ret.append(" extends ");
+        else if (extension!=null)
+            ret.append(" extends ").append(extension);
 
         ret.append(" {");
 
@@ -140,8 +148,8 @@ public class StubGen {
 
         ret.append(tb(s));
 
-        if(isEnum)
-            ret.append("; //this is cuz enums are in field form already");
+        //if(isEnum)
+        //    ret.append("; //this is cuz enums are in field form already");
 
         /*
         * Order (local)
@@ -266,12 +274,12 @@ public class StubGen {
 
                 String name = m.getName();
 
-                if(isEnum) {
+                /*if(isEnum) {
 
                     if(name.equals("values")
                     || name.equals("valueOf"))
                         continue;
-                }
+                }*/
 
                 byte fType = 0;
                 byte access = 0;
@@ -302,13 +310,21 @@ public class StubGen {
 
                 for (Map.Entry<String,Method> e : methods.entrySet()) {
                     Method value = e.getValue();
+                    String name = e.getKey();
 
                     int modifiers = value.getModifiers();
 
+
+                    boolean isMethod = true;
+
+                    if(name.equals("values")
+                            || name.equals("valueOf"))
+                        isMethod=false;
+
                     ret.append(tb(s))
-                            .append(createModsStr(modifiers, value.isSynthetic(),false,true,true))
+                            .append(createModsStr(modifiers, value.isSynthetic(),false,true,isMethod))
                             .append(safeName(value.getReturnType().getName()))
-                            .append(' ').append(e.getKey()).append("(");
+                            .append(' ').append(name).append("(");
 
                     int i = 0;
                     Class<?>[] params = value.getParameterTypes();
@@ -468,11 +484,11 @@ public class StubGen {
                 else if(type==int.class)
                     return ""+f.getInt(null);
                 else if(type==long.class)
-                    return ""+f.getLong(null);
+                    return f.getLong(null)+"l";
                 else if(type==boolean.class)
                     return ""+f.getBoolean(null);
                 else if(type==float.class)
-                    return ""+f.getFloat(null);
+                    return f.getFloat(null)+"f";
                 else if(type==double.class)
                     return ""+f.getDouble(null);
                 else if(type==char.class)
