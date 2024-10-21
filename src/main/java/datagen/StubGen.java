@@ -441,10 +441,10 @@ public class StubGen {
                 name = BASE_CLASS_PREFIX+name;
         }
 
-        if(array>0) {
+        if(array!=-1) {
 
             StringBuilder nameBuilder = new StringBuilder(name);
-            for (int i = 0; i < array; i++) {
+            for (int i = 0; i < array+1; i++) {
                 nameBuilder.append("[]");
             }
 
@@ -457,9 +457,9 @@ public class StubGen {
     private static String getValidFieldValueStr(Field f) {
 
         Class<?> type = f.getType();
-        f.setAccessible(true);
 
         if(Modifier.isStatic(f.getModifiers())) {
+            f.setAccessible(true);
             try {
                 if(type==byte.class)
                     return ""+f.getByte(null);
