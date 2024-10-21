@@ -169,9 +169,12 @@ public class ClassFinder {
                         String aString = stubs.fileText;
 
 
-                        int idxClass = aString.substring(aString.indexOf("Stubclass")+7).indexOf("class");
+                        int idxOff = aString.indexOf("Stubclass")+7;
+                        int idxClass = aString.substring(idxOff).indexOf("class");
                         if(idxClass==-1)
                             idxClass = aString.indexOf("interface");
+                         else
+                            idxClass+=idxOff;
 
                         int idxPublic = aString.indexOf("public");
 
