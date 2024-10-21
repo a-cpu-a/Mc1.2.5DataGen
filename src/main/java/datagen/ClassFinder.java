@@ -24,6 +24,7 @@ public class ClassFinder {
     private static final String JAVA_GAMES_PACKAGE_PREFIX = "net.java.games.";
     private static final String LUAJ_PACKAGE_PREFIX = "org.luaj.";
     private static final String MY_PACKAGE_PREFIX = "datagen.";
+    private static final String MULTIMC_PACKAGE_PREFIX = "org.multimc";
 
     public static List<String> findClasses(URLClassLoader classLoader, String folderPath) throws IOException, URISyntaxException {
         Set<String> classNames = new HashSet<>();
@@ -85,6 +86,7 @@ public class ClassFinder {
                     && !className.startsWith(JAVA_GAMES_PACKAGE_PREFIX)
                     && !className.startsWith(LUAJ_PACKAGE_PREFIX)
                     && !className.startsWith(JAVAX_PACKAGE_PREFIX)
+                    && !className.startsWith(MULTIMC_PACKAGE_PREFIX)
                     //exclude our code
                     && !className.startsWith(MY_PACKAGE_PREFIX)
                     && !className.endsWith("_DataGen")) {
