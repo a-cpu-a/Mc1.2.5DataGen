@@ -136,14 +136,14 @@ public class ClassFinder {
                         if(className.equals("if") || className.equals("do"))
                             classPrefix = "$WasInvalid$";
 
-                        bText = bText.replace("package w;","");
-                        bText = bText.replace("class $","class "+classPrefix);
-                        bText = bText.replace("interface $","interface "+classPrefix);
+                        bText = bText.replace("package "+StubGen.BASE_CLASS_PACKAGE+";","");
+                        bText = bText.replace("class "+StubGen.BASE_CLASS_NAME_PREFIX,"class "+classPrefix);
+                        bText = bText.replace("interface "+StubGen.BASE_CLASS_NAME_PREFIX,"interface "+classPrefix);
 
-                        bText = bText.replace("w.$if ","$WasInvalid$if ");
-                        bText = bText.replace("w.$do ","$WasInvalid$do ");
+                        bText = bText.replace(StubGen.BASE_CLASS_PREFIX+"if ","$WasInvalid$if ");
+                        bText = bText.replace(StubGen.BASE_CLASS_PREFIX+"do ","$WasInvalid$do ");
 
-                        bText = bText.replace("w.$","");
+                        bText = bText.replace(StubGen.BASE_CLASS_PREFIX,"");
                         bText = bText.replace(
                                 " extends ",
                                 " extends "+stubs.extensionThis

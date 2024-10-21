@@ -11,9 +11,9 @@ import java.util.TreeMap;
 
 public class StubGen{
 
-    public static final String BASE_CLASS_PREFIX = "w.$";
+    public static final String BASE_CLASS_PREFIX = "zzz.$";
     public static final String BASE_CLASS_NAME_PREFIX = "$";
-    private static final String BASE_CLASS_PACKAGE = "w";
+    public static final String BASE_CLASS_PACKAGE = "zzz";
 
     /**
      * escape()
