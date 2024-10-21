@@ -169,7 +169,7 @@ public class ClassFinder {
                         String aString = stubs.fileText;
 
 
-                        int idxClass = aString.substring(aString.indexOf("stubclass")+7).indexOf("class");
+                        int idxClass = aString.substring(aString.indexOf("Stubclass")+7).indexOf("class");
                         if(idxClass==-1)
                             idxClass = aString.indexOf("interface");
 
