@@ -164,6 +164,8 @@ public class ClassFinder {
                     if(stubs.extensionThis!=null) {
                         String aString = stubs.fileText;
 
+                        aString = aString.replace("final class ","/*final*/ class ");
+
                         if(stubs.extensionAlt!=null) {
                             aString = aString.replace(
                                     " extends ",
