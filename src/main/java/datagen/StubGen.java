@@ -95,7 +95,7 @@ public class StubGen {
         String classShortName=c.getName();
 
         if(classShortName.indexOf('.')!=-1)
-            classShortName = classShortName.substring(classShortName.indexOf('.'));
+            classShortName = classShortName.substring(classShortName.indexOf('.')+1);
 
         ret.append(createModsStr(mods, c.isSynthetic(), !isEnum,!isEnum,false)).append(type).append(" ").append(safeName(classShortName)).append(" {");
 
