@@ -97,7 +97,7 @@ public class StubGen {
         if(classShortName.indexOf('.')!=-1)
             classShortName = classShortName.substring(classShortName.indexOf('.'));
 
-        ret.append(createModsStr(mods, c.isSynthetic(), !isEnum,!isEnum)).append(type).append(" ").append(safeName(classShortName)).append(" {");
+        ret.append(createModsStr(mods, c.isSynthetic(), !isEnum,!isEnum,false)).append(type).append(" ").append(safeName(classShortName)).append(" {");
 
         //tab count
         int s = 1;
@@ -181,7 +181,7 @@ public class StubGen {
                 for (Map.Entry<String,Field> e : fields.entrySet()) {
                     Field value = e.getValue();
 
-                    ret.append(tb(s)).append(createModsStr(value.getModifiers(), value.isSynthetic(),false,true)).append(safeName(value.getType().getName())).append(' ').append(e.getKey());
+                    ret.append(tb(s)).append(createModsStr(value.getModifiers(), value.isSynthetic(),false,true,false)).append(safeName(value.getType().getName())).append(' ').append(e.getKey());
 
                     //final, or a static non-object/string
                     if(Modifier.isFinal(value.getModifiers())
@@ -268,7 +268,7 @@ public class StubGen {
                     int modifiers = value.getModifiers();
 
                     ret.append(tb(s))
-                            .append(createModsStr(modifiers, value.isSynthetic(),false,true))
+                            .append(createModsStr(modifiers, value.isSynthetic(),false,true,true))
                             .append(safeName(value.getReturnType().getName()))
                             .append(' ').append(e.getKey()).append("(");
 
