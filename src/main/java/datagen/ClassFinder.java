@@ -130,8 +130,19 @@ public class ClassFinder {
 
                     String bText = stubs.fileText;
                     if(stubs.extensionThis!=null) {
+
+                        String classPrefix = "";
+
+                        if(className.equals("if") || className.equals("do"))
+                            classPrefix = "$WasInvalid$";
+
                         bText = bText.replace("package w;","");
-                        bText = bText.replace("class $","class ");
+                        bText = bText.replace("class $","class "+classPrefix);
+                        bText = bText.replace("interface $","interface "+classPrefix);
+
+                        bText = bText.replace("w.$if ","$WasInvalid$if ");
+                        bText = bText.replace("w.$do ","$WasInvalid$do ");
+
                         bText = bText.replace("w.$","");
                         bText = bText.replace(
                                 " extends ",
