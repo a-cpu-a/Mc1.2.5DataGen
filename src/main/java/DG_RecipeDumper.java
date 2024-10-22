@@ -77,8 +77,9 @@ public class DG_RecipeDumper {
                     builder.append("Shaped recipe ").append(shapedCount++).append(":\n");
                     builder.append("From: Forge\n");
                     builder.append("Output: ");dumpItem(builder,(o).b());
-                    if(DG_ShapedOreRecipe.allowMirroring((ShapedOreRecipe) o))
-                        builder.append("Mirroring: true\n");
+                    builder.append("Mirroring: ")
+                            .append(DG_ShapedOreRecipe.allowMirroring((ShapedOreRecipe) o))
+                            .append("\n");
 
                     int w = DG_ShapedOreRecipe.w((ShapedOreRecipe) o);
                     int h = DG_ShapedOreRecipe.h((ShapedOreRecipe) o);
