@@ -13,7 +13,7 @@ public class DG_EEValueDumper {
     public static void dump(File path) throws IOException {
 
 
-        StringBuilder builder = new StringBuilder(10000);
+        StringBuilder builder = new StringBuilder(400000);
 
         TreeMap<Integer,StringBuilder> emc2Lines = new TreeMap<>();
 

@@ -42,6 +42,7 @@ public class mod_DataGen extends BaseMod{
 
             DG_RecipeDumper.dump(dumpDir);
             DG_EEValueDumper.dump(dumpDir);
+            DG_OreDictDumper.dump(dumpDir);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
