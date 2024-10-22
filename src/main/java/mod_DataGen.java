@@ -1,8 +1,8 @@
-import java.io.IOException;
-import java.net.URISyntaxException;
+import cpw.mods.fml.common.FMLCommonHandler;
 
-import static datagen.ClassFinder.testFinder;
-import static datagen.GenStubs.testPrint;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 public class mod_DataGen extends BaseMod{
 
@@ -21,12 +21,28 @@ public class mod_DataGen extends BaseMod{
 
     @Override
     public void modsLoaded() {
+/*
         try {
             testFinder();
             //testPrint();
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
+        }*/
+
+        File minecraftDir = FMLCommonHandler.instance().getMinecraftRootDirectory();
+        File dumpDir = new File(minecraftDir, "datagen"); // Folder containing JARs and ZIPs
+
+
+        try {
+            Files.createDirectories(dumpDir.toPath());
+
+            DG_EEValueDumper.dump(dumpDir);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+
+
     }
 }

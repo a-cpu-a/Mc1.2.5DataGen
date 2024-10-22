@@ -12,9 +12,9 @@ repositories {
 compileJava.options.encoding = "UTF-8"
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
 
+    implementation files('libs/minecraft.jar')
+    implementation fileTree('libs/mods/')
 
     implementation files('libs/lwjgl.jar')
     implementation files('libs/lwjgl_util.jar')
@@ -36,6 +36,7 @@ jar {
 
     include("assets/**") //only my assets
     include("datagen/**") //only my code
+    include("DG_**") //only my code
     include("mod_DataGen*") //only my mod
 
     //everything else is excluded by default
