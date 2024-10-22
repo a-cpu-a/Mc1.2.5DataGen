@@ -1,9 +1,14 @@
+import codechicken.enderstorage.EnderChestRecipe;
 import dan200.turtle.shared.ImpostorRecipe;
+import dan200.turtle.shared.TurtleRecipe;
+import dan200.turtle.shared.TurtleUpgradeRecipe;
 import datagen.StubGen;
+import eloraam.core.CoverRecipe;
 import forge.oredict.OreDictionary;
 import forge.oredict.ShapedOreRecipe;
 import ic2.common.AdvRecipe;
 import ic2.common.AdvShapelessRecipe;
+import nuclearcontrol.StorageArrayRecipe;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +50,6 @@ public class DG_RecipeDumper {
             //damage is not ignored
             sb.append(", ").append("Dmg_").append(itemStack.h());
         }
-
         if(itemStack.d!=null && !itemStack.d.toString().equals("0 entries"))
             sb.append(", Tag_{ASSERT FALSE!}");
             //sb.append(", ").append("Tag_${").append(itemStack.d).append("}");
@@ -71,10 +75,40 @@ public class DG_RecipeDumper {
 
         int shapedCount = 0;
         int shapelessCount = 0;
+        int specCount = 0;
 
         for (wf o : recipes) {
 
-            if(o instanceof ShapedOreRecipe) {
+            if(o instanceof TurtleRecipe) {
+
+                builder.append("Shaped recipe ").append(shapedCount++).append(":\n");
+                builder.append("From: CC\n");
+                builder.append("Type: ").append(o.getClass().getName()).append("\n");
+                builder.append("Output: ");dumpItem(builder,(o).b());
+                builder.append("Mirroring: false\n");
+
+                int[] itemIds = new int[]{
+                        yr.o.bQ, yr.o.bQ, yr.o.bQ,
+                        yr.o.bQ, dan200.computer.shared.ComputerCraft.Items.computer.bQ, yr.o.bQ,
+                        yr.o.bQ, pb.au.bO, yr.o.bQ};
+
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        builder.append("Inputs").append(i).append(j).append(": ");
+                        dumpItem(builder,new aan(itemIds[i+j*3],1,-1));
+                    }
+                }
+            }
+
+            else if(o instanceof StorageArrayRecipe
+            || o instanceof CoverRecipe
+                    || o instanceof EnderChestRecipe
+                    || o instanceof TurtleUpgradeRecipe) {
+                builder.append("Special recipe ").append(specCount++).append(":\n");
+                builder.append("Type: ").append(o.getClass().getName()).append("\n");
+            }
+
+            else if(o instanceof ShapedOreRecipe) {
                 if(o.getClass()!=ShapedOreRecipe.class) {
                     builder.append("TODO (ShapedOreRecipe): ").append(o).append("\n");
                 }
