@@ -36,9 +36,15 @@ public class DG_RecipeDumper {
         if(itemStack.h()!=getItemstackDamageInternal(itemStack))
             sb.append("{ASSERT FALSE!}");
 
-        sb.append("Id_").append(itemStack.c).append(", ")
-         .append("Amt_").append(itemStack.a).append(", ")
-                .append("Dmg_").append(itemStack.h());
+        sb.append("Id_").append(itemStack.c);
+
+        if(itemStack.a!=1)
+            sb.append(", ").append("Amt_").append(itemStack.a);
+
+        if(itemStack.h()!=-1) {
+            //damage is not ignored
+            sb.append(", ").append("Dmg_").append(itemStack.h());
+        }
 
         if(itemStack.d!=null && !itemStack.d.toString().equals("0 entries"))
             sb.append(", Tag_{ASSERT FALSE!}");
