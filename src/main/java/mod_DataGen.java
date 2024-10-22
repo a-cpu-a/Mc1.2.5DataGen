@@ -1,4 +1,6 @@
 import cpw.mods.fml.common.FMLCommonHandler;
+import dan200.computer.core.Computer;
+import dan200.turtle.shared.CCTurtle;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,9 +36,11 @@ public class mod_DataGen extends BaseMod{
         File dumpDir = new File(minecraftDir, "datagen"); // Folder containing JARs and ZIPs
 
 
+
         try {
             Files.createDirectories(dumpDir.toPath());
 
+            DG_RecipeDumper.dump(dumpDir);
             DG_EEValueDumper.dump(dumpDir);
 
         } catch (IOException e) {
