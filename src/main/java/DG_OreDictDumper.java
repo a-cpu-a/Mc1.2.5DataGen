@@ -18,7 +18,7 @@ public class DG_OreDictDumper {
             String name = OreDictionary.getOreName(i);
             ArrayList<aan> items = OreDictionary.getOres(i);
 
-            builder.append("Oredict \"").append(StubGen.escape(name)).append("\"");
+            builder.append("Oredict \"").append(StubGen.escape(name)).append("\"\n");
 
             for (aan itemStack : items) {
                 DG_RecipeDumper.dumpItem(builder,itemStack);
