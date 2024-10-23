@@ -1,7 +1,7 @@
 import java.lang.reflect.Field;
 import java.util.List;
 
-public class DG_aif {
+public class DGr_aif {
 
     private static final Class<aif> CLASS = aif.class;
 

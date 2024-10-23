@@ -37,6 +37,7 @@ jar {
     include("assets/**") //only my assets
     include("datagen/**") //only my code
     include("DG_**") //only my code
+    include("DGr_**") //only my code
     include("mod_DataGen*") //only my mod
 
     //everything else is excluded by default

@@ -2,7 +2,7 @@ import forge.oredict.ShapedOreRecipe;
 
 import java.lang.reflect.Field;
 
-public class DG_ShapedOreRecipe {
+public class DGr_ShapedOreRecipe {
 
     private static final Class<ShapedOreRecipe> CLASS = ShapedOreRecipe.class;
 

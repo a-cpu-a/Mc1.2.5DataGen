@@ -118,12 +118,12 @@ public class DG_RecipeDumper {
                     builder.append("From: Forge\n");
                     builder.append("Output: ");dumpItem(builder,(o).b());
                     builder.append("Mirroring: ")
-                            .append(DG_ShapedOreRecipe.allowMirroring((ShapedOreRecipe) o))
+                            .append(DGr_ShapedOreRecipe.allowMirroring((ShapedOreRecipe) o))
                             .append("\n");
 
-                    int w = DG_ShapedOreRecipe.w((ShapedOreRecipe) o);
-                    int h = DG_ShapedOreRecipe.h((ShapedOreRecipe) o);
-                    Object[] inputs = DG_ShapedOreRecipe.inputs((ShapedOreRecipe) o);
+                    int w = DGr_ShapedOreRecipe.w((ShapedOreRecipe) o);
+                    int h = DGr_ShapedOreRecipe.h((ShapedOreRecipe) o);
+                    Object[] inputs = DGr_ShapedOreRecipe.inputs((ShapedOreRecipe) o);
 
                     if(inputs.length!=w*h)
                         builder.append("ASSERT FALSE!");
@@ -199,9 +199,9 @@ public class DG_RecipeDumper {
                     builder.append("Output: ");dumpItem(builder,(o).b());
                     builder.append("Mirroring: true\n");
 
-                    int w = DG_aai.w((aai) o);
-                    int h = DG_aai.h((aai) o);
-                    aan[] inputs = DG_aai.inputs((aai) o);
+                    int w = DGr_aai.w((aai) o);
+                    int h = DGr_aai.h((aai) o);
+                    aan[] inputs = DGr_aai.inputs((aai) o);
 
                     if(inputs.length!=w*h)
                         builder.append("ASSERT FALSE!");
@@ -225,7 +225,7 @@ public class DG_RecipeDumper {
                     builder.append("From: Vanilla\n");
                     builder.append("Output: ");dumpItem(builder,(o).b());
 
-                    List<aan> inputs = DG_aif.inputs((aif) o);
+                    List<aan> inputs = DGr_aif.inputs((aif) o);
 
                     for (int i = 0; i < inputs.size(); i++) {
                         builder.append("Inputs").append(i).append(": ");

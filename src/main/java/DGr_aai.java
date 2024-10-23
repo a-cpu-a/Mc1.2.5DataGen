@@ -1,6 +1,6 @@
 import java.lang.reflect.Field;
 
-public class DG_aai {
+public class DGr_aai {
 
     private static final Class<aai> CLASS = aai.class;
 
